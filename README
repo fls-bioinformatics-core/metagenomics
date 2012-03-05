@@ -1,1 +1,7 @@
 metagenomics: repository for FLS in-house metagenomics-related software
+=======================================================================
+
+Scripts are organised into the following directories:
+
+ * `mothur`: scripts for running standard mothur workflows for metagenomic
+   analyses
