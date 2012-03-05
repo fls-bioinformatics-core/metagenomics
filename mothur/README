@@ -1,0 +1,213 @@
+MOTHUR WORKFLOW: README
+=======================
+
+Background/Overview
+-------------------
+
+These scripts perform an automated metagenomic analysis of samples of arbitrary
+sequence fragments from several different organisms. The analysis clusters the
+sequences at various levels of similarity, to give an indication of the distinct
+organisms within the sample. The analysis can also be applied to multiple samples,
+for example drawn from two separate locations.
+
+There are three scripts:
+
+   - m_noise.sh: prepare the inputs for clustering by "de-noise"-ing sequencing errors
+   - m_sample_cluster.sh: perform metagenomic analysis for a single sample
+   - m_samples_cluster.sh: perform metagenomic analysis for multiple samples
+
+Typical usage is to run m_noise.sh first to clean up the data and prepare input for
+the clustering procedure, which is then performed by running either m_sample_cluster.sh
+(single sample clustering analysis) or m_samples_cluster.sh (multiple samples).
+
+The multiple sample analysis script is preferred over the single sample version, but
+requires intense computational resources and so is only suitable for running on HPC
+systems.
+
+The clustering scripts produce a large number of outputs which are described below.
+
+General setup and requirements
+------------------------------
+
+The minimum requirements are:
+
+    - mothur 1.23
+    - reference data files for performing the analysis
+
+Install mothur
+
+   - Download mothur from http://www.mothur.org
+   - Either build from source or get the pre-built binaries for your platform
+
+Reference data
+
+   - Mothur lookup files:
+
+     See index page with reference files at http://www.mothur.org/wiki/Lookup_files
+
+     http://www.mothur.org/w/images/9/96/LookUp_Titanium.zip
+     http://www.mothur.org/w/images/8/84/LookUp_GSFLX.zip
+     http://www.mothur.org/w/images/7/7b/LookUp_GS20.zip
+
+     These should be unpacked in the directory $HOME/mothur/
+
+   - Other reference data files:
+
+     Greengenes:  http://www.mothur.org/w/images/7/72/Greengenes.alignment.zip
+       	    	  http://www.mothur.org/w/images/2/21/Greengenes.gold.alignment.zip
+		  http://www.mothur.org/w/images/1/16/Greengenes.tax.tgz
+     Silva:	  http://www.mothur.org/w/images/9/98/Silva.bacteria.zip
+		  http://www.mothur.org/w/images/3/3c/Silva.archaea.zip
+		  http://www.mothur.org/w/images/1/1a/Silva.eukarya.zip
+		  http://www.mothur.org/w/images/f/f1/Silva.gold.bacteria.zip
+
+     Download these files and put into a reference database directory:
+     $HOME/ref_data/
+
+     NB for silva.bacteria: the files unpack into a subdirectory silva.bacteria
+     but m_noise.sh expects them to be in $HOME/ref_data:
+
+     % unzip Silva.bacteria.zip
+     % mv silva.bacteria/* .
+     % rmdir silva.bacteria
+
+Additional tools
+
+A tree viewing utility such as TreeVector (http://supfam.cs.bris.ac.uk/TreeVector/about.html)
+or FastTree is useful for rendering plots of the phylogenetic tree data output from the
+clustering analysis. TreeVector can be downloaded or used as an online tool.
+
+Input Data
+----------
+
+The workflow requires an SFF (Standard flowgram format) file containing pyrosequencing
+results produced by the 454 Life Sciences platform, and an oligos file which contains
+the sequences of the forward and reverse primers and the barcodes and their sample
+identifier (see the mothur documentation for more information on the oligos file:
+http://www.mothur.org/wiki/Trim.flows#oligos).
+
+Running the scripts
+-------------------
+
+- Specifics of using each script (e.g. options, command line, required inputs)
+
+1. m_noise.sh: data preparation by "de-noising"
+
+   The data preparation step must be performed for each sample that will be analysed. It
+   is run using:
+
+   % m_noise.sh <sff_file>
+
+   Note that this needs to be run in the same directory as the input <sff_file>, and that
+   an oligo file called "map.oligos" must also be present.
+
+   This uses the "seqnoise" function in mothur to clean up sequence data for input into
+   the clustering step. It produces several output files; the most important are:
+
+   - the final FASTA file "<base>.trim.shhh.trim.unique.good.filter.fasta", and
+   - "<base>.trim.shhh.trim.good.names" file contains the names of the sequences that were
+     processed
+
+   These are needed as input to the clustering analysis step.
+
+   You also need the "groups" file for running the multiple sample clustering:
+
+   - the "<base>.trim.shhh.trim.unique.good.filter.groups" file (needed for multiple sample
+     analysis only)
+
+2.1 m_sample_cluster.sh: cluster analysis for a single sample
+
+   This clusters sequences into distinct groups, with each cluster/group indicating a
+   different species. This script works with a single sample.
+
+   Run by supplying the FASTA and ".good.names" files from the de-noising step as input:
+
+   % m_sample_cluster.sh <base>.trim.shhh.trim.unique.good.filter.fasta
+
+   See "Outputs and interpretation" below for information on the output files.
+
+2.2 m_samples_cluster.sh: cluster analysis for multiple samples
+
+   This clusters sequences from multiple samples:
+
+   % m_samples_cluster.sh
+
+   No arguments are required as this script operates on all the files it finds in the
+   working directory. It expects the following outputs from the m_noise.sh step for
+   each sample:
+
+   - *.trim.shhh.trim.unique.good.filter.groups
+   - *.trim.shhh.trim.unique.good.filter.fasta
+   - *.trim.shhh.trim.good.names
+
+   Because this is so computationally intensive it should be run on a suitable HPC
+   facility (see below).
+
+   See "Outputs and interpretation" below for information on the output files.
+
+Outputs and interpretation
+--------------------------
+
+The following outputs are produced by the m_sample_cluster.sh script:
+
+ - *.tre: tree data (use e.g. TreeVector to render as a plot for viewing)
+
+ - *.taxonomy: phylogenetic classification of group of sequences (i.e. OTUs)
+
+ - *.tax.summary: summary of the taxonomy file
+
+ - *.rarefaction: gives an indication of whether there are enough samples; gives OTU
+   ("operational taxonomic units") as a function of sequences.
+
+ - *.rep.*: representative sequences from each cluster
+
+For the m_samples_cluster.sh script additional outputs are produced:
+
+ - *.phylodiv.*: phylodiversity information
+
+ - heatmaps: *.heatmap.bin (diversity) or *.heatmap.sim (similarity)
+
+ - Venn diagrams: SVG files showing overlaps between samples (look for sample names in
+   the file name e.g. "*N0_1-N1_1-O1_1.svg"
+
+Also outputs:
+
+ - *.list: outputs groups of sequences as a function of "distance levels" (generally
+   larger distances result in fewer groups with more sequences per group). Not normally
+   looked at directly.
+
+Running the workflow on different platforms (desktop versus cluster)
+--------------------------------------------------------------------
+
+m_noise.sh and m_sample_cluster.sh are suitable for running on a deskop computer;
+to take advantage of multiple cores, change the value of the NSLOTS variable in
+the scripts to the preferred number of cores.
+
+m_samples_cluster.sh is computationally intensive and it is probably more desirable
+to run this on a HPC cluster. To use the scripts on a HPC platform that supports
+Grid Engine (GE), comment out the NSLOTS setting in each script and edit the
+GE directives at the head of the script as appropriate. The scripts should be
+submitted using the standard qsub command.
+
+Examples
+--------
+
+- example data and commands
+
+Example data files are provided to try out the program with:
+
+- N0_1.sff
+- map.oligo
+
+The procedure for running the workflow is:
+
+% m_noise.sh N0_1.sff
+% m_sample_cluster.sh N0_1.trim.shhh.trim.unique.good.filter.fasta
+
+Hints and tips
+--------------
+
+- gotchas and anything else that might be useful
+
+   - There is a bug in mothur 1.23.1 'shhh.flows' command which causes the
+   m_noise.sh script to fail.
