@@ -42,6 +42,10 @@ Install mothur
 
 Reference data
 
+   The following data files are required. The `setup_mothur.sh` script can also be
+   run, this will attempts to download and unpack the reference data in the
+   appropriate places automatically if you don't want to get the data by hand.
+
    - Mothur lookup files:
 
      See index page with reference files at http://www.mothur.org/wiki/Lookup_files
