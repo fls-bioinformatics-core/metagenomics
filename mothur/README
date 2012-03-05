@@ -4,11 +4,12 @@ MOTHUR WORKFLOW: README
 Background/Overview
 -------------------
 
-These scripts perform an automated metagenomic analysis of samples of arbitrary
-sequence fragments from several different organisms. The analysis clusters the
-sequences at various levels of similarity, to give an indication of the distinct
-organisms within the sample. The analysis can also be applied to multiple samples,
-for example drawn from two separate locations.
+These scripts perform an automated metagenomic analysis of sequencing data sets
+from a Roche454 16s or 18s rRNA sequence project from environmental or tissure
+samples. The analysis clusters the sequences at various levels of similarity to
+give an indication of the distinct organisms within the sample. The analysis can
+be applied to both a single sample or multiple samples, for example drawn from
+two separate locations.
 
 There are three scripts:
 
@@ -82,8 +83,8 @@ Input Data
 
 The workflow requires an SFF (Standard flowgram format) file containing pyrosequencing
 results produced by the 454 Life Sciences platform, and an oligos file which contains
-the sequences of the forward and reverse primers and the barcodes and their sample
-identifier (see the mothur documentation for more information on the oligos file:
+the sequences of the forward and reverse primers and the barcodes for each sample
+(see the mothur documentation for more information on the oligos file:
 http://www.mothur.org/wiki/Trim.flows#oligos).
 
 Running the scripts
@@ -156,7 +157,7 @@ The following outputs are produced by the m_sample_cluster.sh script:
 
  - *.tax.summary: summary of the taxonomy file
 
- - *.rarefaction: gives an indication of whether there are enough samples; gives OTU
+ - *.rarefaction: gives an indication of whether the sample size is adequate; gives OTU
    ("operational taxonomic units") as a function of sequences.
 
  - *.rep.*: representative sequences from each cluster
