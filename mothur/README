@@ -202,21 +202,6 @@ The scripts should be submitted using the standard qsub command, e.g.
 
 % qsub -N denoise m_noise.sh sample.sff
 
-Examples
---------
-
-- example data and commands
-
-Example data files are provided to try out the program with:
-
-- N0_1.sff
-- map.oligo
-
-The procedure for running the workflow is:
-
-% m_noise.sh N0_1.sff
-% m_sample_cluster.sh N0_1.trim.shhh.trim.unique.good.filter.fasta
-
 Hints and tips
 --------------
 
