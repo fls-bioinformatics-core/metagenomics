@@ -20,7 +20,13 @@ NSLOTS=2
 #		*.groups, a group file which labels the sample with a group name.
 #		*.names, a name file contains grouping information about the samples.
 #   Requires: 	A map file which provide the sequencing primer and sample barcode and sample name, saved as "map.oligos"
-#   dependency: mothur-1.23.0, bash
+#		map.oligos				(file name)
+#		#forward	CATGCTGCCTCCCGTAGGAGT	(file content)
+#		#reverse	TCAGAGTTTGATCCTGGCTCAG
+#		barcode	ACGAGTGCGT	N0_1
+#		barcode	ACGCTCGACA	N1_1
+#
+#   dependency: mothur-1.25.0, bash
 #    		Lookup files: (GS FLX Titanium, GSFLX, GS20) http://www.mothur.org/wiki/Lookup_files
 #		($HOME/mothur/LookUp_Titanium.pat)
 #		Reference database: $HOME/ref_data/
@@ -41,7 +47,7 @@ NSLOTS=2
 #   To execute the script on a linux machine $ "m_noise.sh sfffile_name"
 #   To execute the scrip in csf server:$ qsub path/m_noise.sh sfffile_name
 #
-#   ping.wang@manchester.ac.uk, FLS, University of Manchester, 18/1/2012
+#   ping.wang@manchester.ac.uk, FLS, University of Manchester, 02/5/2012
 ###################################################################################################################################
 inf=$1
 fn=`echo $inf | sed "s/.[a-zA-Z0-9]*$//"`
@@ -51,8 +57,8 @@ mothur "#trim.flows(flow=$fn.flow,oligos=map.oligos,pdiffs=2, maxflows=720, bdif
 mothur "#shhh.flows(flow=$fn.trim.flow,lookup=$HOME/mothur/LookUp_Titanium.pat,processors=$NSLOTS)"
 mothur "#trim.seqs(fasta=$fn.trim.shhh.fasta,name=$fn.trim.shhh.names,oligos=map.oligos,minlength=400,maxambig=0,maxhomop=8,qaverage=25,qwindowaverage=35,qwindowsize=50, processors=$NSLOTS)"
 
-#mothur "#shhh.seqs(fasta=$fn.trim.shhh.trim.fasta, name=$fn.trim.shhh.trim.names,group=$fn.trim.shhh.groups, sigma=0.01)"
-#mothur "#shhh.seqs(fasta=$fn.$sfx, name=$fn.names,sigma=0.01, processors=$NSLOTS)"
+mothur "#shhh.seqs(fasta=$fn.trim.shhh.trim.fasta, name=$fn.trim.shhh.trim.names,group=$fn.trim.shhh.groups, sigma=0.01)"
+mothur "#shhh.seqs(fasta=$fn.$sfx, name=$fn.names,sigma=0.01, processors=$NSLOTS)"
 
 mothur "#unique.seqs(fasta=$fn.trim.shhh.trim.fasta)"
 
