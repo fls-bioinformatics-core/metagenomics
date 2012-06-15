@@ -29,6 +29,8 @@ NSLOTS=2
 #
 #   Dependency: mothur-1.23.0, bash
 #    
+#   The script expects the reference alignment data files to be in the directory $HOME/ref_data
+#   Set the MOTHUR_REF_DATA environment variable to override this default
 #
 #   To execute the script on a linux machine $ "m_samples_cluster.sh"
 #   To execute the scrip in csf server:$ qsub path/m_samples_cluster.sh
@@ -42,10 +44,19 @@ cat *.trim.shhh.trim.good.names > merge.names
 inf=merge.fasta
 fn=`echo $inf | sed "s/.[a-zA-Z0-9]*$//"`
 
+# Locations of reference data files
+: ${MOTHUR_REF_DATA:=$HOME/ref_data}
+if [ ! -d "$MOTHUR_REF_DATA" ] ; then
+    echo Missing reference alignments data directory $MOTHUR_REF_DATA
+    echo Set the MOTHUR_REF_DATA variable to specify the location of the reference files
+    echo if they are installed somewhere else
+    exit 1
+fi
+
 mothur "#summary.seqs(fasta=$fn.fasta)"
 
 mothur "#pre.cluster(fasta=$fn.fasta,name=$fn.names,diffs=3)"
-mothur "#chimera.uchime(fasta=$fn.precluster.fasta,reference=$HOME/ref_data/silva.gold.align, chimealns=T, minh=0.3, mindiv=0.5, xn=8.0, dn=1.4, xa=1.0, chunks=4, minchunk=64, idsmoothwindow=32, maxp=2, skipgaps=T, skipgaps2=T, minlen=10, maxlen=10000, ucl=false, queryfract=0.5)"
+mothur "#chimera.uchime(fasta=$fn.precluster.fasta,reference=$MOTHUR_REF_DATA/silva.gold.align, chimealns=T, minh=0.3, mindiv=0.5, xn=8.0, dn=1.4, xa=1.0, chunks=4, minchunk=64, idsmoothwindow=32, maxp=2, skipgaps=T, skipgaps2=T, minlen=10, maxlen=10000, ucl=false, queryfract=0.5)"
 mothur "#remove.seqs(accnos=$fn.precluster.uchime.accnos,name=$fn.precluster.names)"
 mothur "#remove.seqs(accnos=$fn.precluster.uchime.accnos,fasta=$fn.precluster.fasta)"
 mothur "#remove.seqs(accnos=$fn.precluster.uchime.accnos,group=$fn.groups)"
@@ -53,7 +64,7 @@ mothur "#remove.seqs(accnos=$fn.precluster.uchime.accnos,group=$fn.groups)"
 
 mothur "#summary.seqs(fasta=$fn.precluster.pick.fasta)"
 
-mothur "#align.seqs(candidate=$fn.precluster.pick.fasta, template=$HOME/ref_data/silva.bacteria.fasta, search=kmer, ksize=8, align=needleman, match=1, mismatch=-2, gapopen=-1, flip=t, threshold=0.5, processors=$NSLOTS)"
+mothur "#align.seqs(candidate=$fn.precluster.pick.fasta, template=$MOTHUR_REF_DATA/silva.bacteria.fasta, search=kmer, ksize=8, align=needleman, match=1, mismatch=-2, gapopen=-1, flip=t, threshold=0.5, processors=$NSLOTS)"
 mothur "#filter.seqs(fasta=$fn.precluster.pick.align, trump=., vertical=T, processors=$NSLOTS)"
 mothur "#dist.seqs(fasta=$fn.precluster.pick.filter.fasta,calc=onegap,countends=F,cutoff=0.20,output=lt,processors=$NSLOTS)"
 
@@ -80,12 +91,12 @@ mothur "#heatmap.sim(shared=$fn.precluster.pick.filter.phylip.nn.shared)" #beta 
 mothur "#venn(shared=$fn.precluster.pick.filter.phylip.nn.shared,nseqs=T,permute=t,calc=sharedsobs-sharedchao)" shared richness
 
 mothur "#get.oturep(phylip=$fn.precluster.pick.filter.phylip.dist, fasta=$fn.fasta, list=$fn.precluster.pick.filter.phylip.nn.list,label=unique-0.01-0.03-0.05-0.10,name=$fn.names,group=merge.groups)"
-mothur "#align.seqs(candidate=$fn.precluster.pick.filter.phylip.nn.0.03.rep.fasta, template=$HOME/ref_data/silva.bacteria.fasta, search=kmer, ksize=8, align=needleman, match=1, mismatch=-2, gapopen=-1, flip=t, threshold=0.5, processors=$NSLOTS)"
+mothur "#align.seqs(candidate=$fn.precluster.pick.filter.phylip.nn.0.03.rep.fasta, template=$MOTHUR_REF_DATA/silva.bacteria.fasta, search=kmer, ksize=8, align=needleman, match=1, mismatch=-2, gapopen=-1, flip=t, threshold=0.5, processors=$NSLOTS)"
 mothur "#clearcut(fasta=$fn.precluster.pick.filter.phylip.nn.0.03.rep.align, DNA=t)"
 
 mothur "#phylo.diversity(tree=$fn.precluster.pick.filter.phylip.nn.0.03.rep.tre,group=merge.groups,freq=0.1,rarefy=T)"  #,rarefy=T,, collect=T,name=$fn.precluster.pick.names,rarefy=T
 
-mothur "#classify.seqs(fasta=$fn.precluster.pick.filter.phylip.nn.rep.fasta, template=$HOME/ref_data/silva.bacteria.fasta, taxonomy=$HOME/ref_data/silva.bacteria/silva.bacteria.silva.tax,method=bayesian,cutoff=95,probs=f)"
+mothur "#classify.seqs(fasta=$fn.precluster.pick.filter.phylip.nn.rep.fasta, template=$MOTHUR_REF_DATA/silva.bacteria.fasta, taxonomy=$MOTHUR_REF_DATA/silva.bacteria/silva.bacteria.silva.tax,method=bayesian,cutoff=95,probs=f)"
 mothur "#classify.otu(taxonomy=$fn.precluster.pick.filter.phylip.nn.rep.silva.taxonomy, list=$fn.precluster.pick.filter.phylip.nn.list,basis=otu,probs=f)"
 
 mothur "#unifrac.weighted(tree=$fn.precluster.pick.filter.phylip.nn.0.03.rep.tre, group=merge.groups,name=merge.precluster.pick.filter.phylip.nn.0.03.rep.names,random=t,distance=square)"
