@@ -42,9 +42,16 @@ Install mothur
 
 Reference data
 
-   The following data files are required. The `setup_mothur.sh` script can also be
-   run, this will attempt to download and unpack the reference data in the
-   appropriate places automatically if you don't want to get the data by hand.
+   The following data files are required. By default lookup files are expected to
+   be in $HOME/mothur and reference alignments in $HOME/ref_data; these locations can
+   be overridden by setting the MOTHUR_LOOKUP and MOTHUR_REF_DATA environment
+   variables, e.g.
+
+     % export MOTHUR_LOOKUP=$HOME/mothur/lookups
+     % export MOTHUR_REF_DATA=$HOME/mothur/ref_alignments
+
+   The `setup_mothur.sh` script can be run to automatically download and unpack the
+   reference data in the appropriate places automatically.
 
    - Mothur lookup files needed to run shhh.flows:
 
@@ -87,7 +94,7 @@ Reference data
 
      % unzip Silva.bacteria.zip
      % mv silva.bacteria/* .
-     % rmdir silva.bacteria
+     % rm -rf silva.bacteria
 
 Additional tools
 
@@ -107,7 +114,10 @@ http://www.mothur.org/wiki/Trim.flows#oligos).
 Running the scripts
 -------------------
 
-- Specifics of using each script (e.g. options, command line, required inputs)
+0. Before running the scripts make sure that you set the MOTHUR_LOOKUP and MOTHUR_REF_DATA
+   environment variables if the lookup and reference alignment data are installed in a
+   location other than $HOME/mothur and $HOME/ref_data (see the section on "Reference data"
+   above).
 
 1. m_noise.sh: data preparation by "de-noising"
 
