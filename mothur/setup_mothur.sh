@@ -5,34 +5,46 @@
 # This script should be run once to download and install the data
 # necessary for the mothur workflow scripts
 #
+# Lookup files will be placed in the directory $MOTHUR_LOOKUP
+# (defaults to $HOME/mothur)
+#
+# Reference alignment files will be placed in directory
+# $MOTHUR_REF_DATA (defaults to $HOME/ref_data)
+#
+# Set the MOTHUR_LOOKUP and MOTHUR_REF_DATA variables in your
+# environment to over ride the default locations, e.g.
+#
+# % export MOTHUR_LOOKUP=$HOME/mothur/lookup
+# % export MOTHUR_REF_DATA=$HOME/mothur/ref_alignments
+#
 # Directories for data
-MOTHUR_DATA_DIR=$HOME/mothur
-REF_DATA_DIR=$HOME/ref_data
+: ${MOTHUR_LOOKUP:=$HOME/mothur}
+: ${MOTHUR_REF_DATA:=$HOME/ref_data}
 #
 # Start
 echo SETTING UP DATA FOR MOTHUR WORKFLOWS
 echo
 echo Data will be installed in the following locations:
-echo $MOTHUR_DATA_DIR: mothur look up files
-echo $REF_DATA_DIR: reference data files
+echo $MOTHUR_LOOKUP: mothur lookup files
+echo $MOTHUR_REF_DATA: reference alignment data files
 echo
 #
 # Check for/make data directories
-if [ ! -d $MOTHUR_DATA_DIR ] ; then
-    echo Creating $MOTHUR_DATA_DIR for look up files
-    mkdir $MOTHUR_DATA_DIR
+if [ ! -d $MOTHUR_LOOKUP ] ; then
+    echo Creating $MOTHUR_LOOKUP for lookup files
+    mkdir -p $MOTHUR_LOOKUP
 else
-    echo Found $MOTHUR_DATA_DIR
+    echo Found $MOTHUR_LOOKUP
 fi
-if [ ! -d $REF_DATA_DIR ] ; then
-    echo Creating $REF_DATA_DIR for reference data
-    mkdir $REF_DATA_DIR
+if [ ! -d $MOTHUR_REF_DATA ] ; then
+    echo Creating $MOTHUR_REF_DATA for reference alignment data
+    mkdir -p $MOTHUR_REF_DATA
 else
-    echo Found $REF_DATA_DIR
+    echo Found $MOTHUR_REF_DATA
 fi
 #
 # Download look up files
-pushd $MOTHUR_DATA_DIR
+pushd $MOTHUR_LOOKUP
 echo
 echo Installing lookup files in `pwd`
 for url in \
@@ -54,7 +66,7 @@ done
 popd
 #
 # Download reference data
-pushd $REF_DATA_DIR
+pushd $MOTHUR_REF_DATA
 echo
 echo Installing reference data files in `pwd`
 for url in \
