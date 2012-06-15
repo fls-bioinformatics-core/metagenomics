@@ -87,7 +87,7 @@ done
 # Move silva.bacteria data out of subdir
 if [ -d silva.bacteria ] ; then
     mv silva.bacteria/* .
-    rmdir silva.bacteria
+    rm -rf silva.bacteria
 else
     echo WARNING directory silva.bacteria not found
 fi
