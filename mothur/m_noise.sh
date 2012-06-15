@@ -28,8 +28,8 @@ NSLOTS=2
 #
 #   dependency: mothur-1.25.0, bash
 #    		Lookup files: (GS FLX Titanium, GSFLX, GS20) http://www.mothur.org/wiki/Lookup_files
-#		($HOME/mothur/LookUp_Titanium.pat)
-#		Reference database: $HOME/ref_data/
+#		($MOTHUR_LOOKUP/LookUp_Titanium.pat)
+#		Reference database: $MOTHUR_REF_DATA/
 #			Greengenes:  http://www.mothur.org/w/images/7/72/Greengenes.alignment.zip
 #				     http://www.mothur.org/w/images/2/21/Greengenes.gold.alignment.zip
 #				     http://www.mothur.org/w/images/1/16/Greengenes.tax.tgz
@@ -48,13 +48,30 @@ NSLOTS=2
 #   To execute the scrip in csf server:$ qsub path/m_noise.sh sfffile_name
 #
 #   ping.wang@manchester.ac.uk, FLS, University of Manchester, 02/5/2012
+#   Updates: peter.briggs@manchester.ac.uk 15/6/2012
 ###################################################################################################################################
 inf=$1
 fn=`echo $inf | sed "s/.[a-zA-Z0-9]*$//"`
 sfx=`echo $inf | sed "s/^$fn.//"`
+#
+# Locations of lookup and reference data files
+: ${MOTHUR_LOOKUP:=$HOME/mothur}
+: ${MOTHUR_REF_DATA:=$HOME/ref_data}
+if [ ! -d "$MOTHUR_LOOKUP" ] ; then
+    echo Missing lookup data directory $MOTHUR_LOOKUP
+    echo Set the MOTHUR_LOOKUP variable to specify the location of the lookup data files
+    echo if they are installed somewhere else
+    exit 1
+fi
+if [ ! -d "$MOTHUR_REF_DATA" ] ; then
+    echo Missing reference alignments data directory $MOTHUR_REF_DATA
+    echo Set the MOTHUR_REF_DATA variable to specify the location of the reference files
+    echo if they are installed somewhere else
+    exit 1
+fi
 mothur "#sffinfo(sff=$fn.sff,flow=T,trim=t)"
 mothur "#trim.flows(flow=$fn.flow,oligos=map.oligos,pdiffs=2, maxflows=720, bdiffs=1,processors=$NSLOTS)" 
-mothur "#shhh.flows(flow=$fn.trim.flow,lookup=$HOME/mothur/LookUp_Titanium.pat,processors=$NSLOTS)"
+mothur "#shhh.flows(flow=$fn.trim.flow,lookup=$MOTHUR_LOOKUP/LookUp_Titanium.pat,processors=$NSLOTS)"
 mothur "#trim.seqs(fasta=$fn.trim.shhh.fasta,name=$fn.trim.shhh.names,oligos=map.oligos,minlength=400,maxambig=0,maxhomop=8,qaverage=25,qwindowaverage=35,qwindowsize=50, processors=$NSLOTS)"
 
 mothur "#shhh.seqs(fasta=$fn.trim.shhh.trim.fasta, name=$fn.trim.shhh.trim.names,group=$fn.trim.shhh.groups, sigma=0.01)"
@@ -62,7 +79,7 @@ mothur "#shhh.seqs(fasta=$fn.$sfx, name=$fn.names,sigma=0.01, processors=$NSLOTS
 
 mothur "#unique.seqs(fasta=$fn.trim.shhh.trim.fasta)"
 
-mothur "#align.seqs(candidate=$fn.trim.shhh.trim.unique.fasta, template=$HOME/ref_data/silva.bacteria.fasta,search=kmer,ksize=8,align=needleman,match=1,mismatch=-2,gapopen=-1,flip=t,threshold=0.5,processors=$NSLOTS)"
+mothur "#align.seqs(candidate=$fn.trim.shhh.trim.unique.fasta, template=$MOTHUR_REF_DATA/silva.bacteria.fasta,search=kmer,ksize=8,align=needleman,match=1,mismatch=-2,gapopen=-1,flip=t,threshold=0.5,processors=$NSLOTS)"
 
 mothur "#screen.seqs(fasta=$fn.trim.shhh.trim.unique.align, minlength=400, optimize=start, criteria=85, alignreport=$fn.trim.shhh.trim.unique.align.report,processors=4,group=$fn.trim.shhh.groups,name=$fn.trim.shhh.trim.names)"
 
