@@ -43,10 +43,10 @@ Install mothur
 Reference data
 
    The following data files are required. The `setup_mothur.sh` script can also be
-   run, this will attempts to download and unpack the reference data in the
+   run, this will attempt to download and unpack the reference data in the
    appropriate places automatically if you don't want to get the data by hand.
 
-   - Mothur lookup files:
+   - Mothur lookup files needed to run shhh.flows:
 
      See index page with reference files at http://www.mothur.org/wiki/Lookup_files
 
@@ -56,12 +56,25 @@ Reference data
 
      These should be unpacked in the directory $HOME/mothur/
 
-   - Other reference data files:
+   - Reference database files for mothur's aligner:
 
-     Greengenes:  http://www.mothur.org/w/images/7/72/Greengenes.alignment.zip
+     See index page at http://www.mothur.org/wiki/Alignment_database
+
+     There are two databases for rRNA gene sequences provided:
+
+     * Greengenes-based alignments http://www.mothur.org/wiki/Greengenes-formatted_databases
+
+       The specific files to download are:
+
+                  http://www.mothur.org/w/images/7/72/Greengenes.alignment.zip
        	    	  http://www.mothur.org/w/images/2/21/Greengenes.gold.alignment.zip
 		  http://www.mothur.org/w/images/1/16/Greengenes.tax.tgz
-     Silva:	  http://www.mothur.org/w/images/9/98/Silva.bacteria.zip
+
+     * SILVA reference data http://www.mothur.org/wiki/Silva_reference_files
+
+       The specific files to download are:
+
+		  http://www.mothur.org/w/images/9/98/Silva.bacteria.zip
 		  http://www.mothur.org/w/images/3/3c/Silva.archaea.zip
 		  http://www.mothur.org/w/images/1/1a/Silva.eukarya.zip
 		  http://www.mothur.org/w/images/f/f1/Silva.gold.bacteria.zip
